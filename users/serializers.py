@@ -6,6 +6,7 @@ from .models import *
 
 class UserInlineSerializer(serializers.ModelSerializer):
     class Meta:
+        model = User
         fields = "__all__"
 
 
