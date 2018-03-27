@@ -8,7 +8,8 @@ app_name = 'users'
 api_urls = [
 
     url(r'^new/$', CreateUser.as_view(), name='new-user'),    
-    url(r'^(?P<phone_number>\d+)/$', RetrieveUserView.as_view(), name='user-view'),
+    url(r'^(?P<email>([\w+.]+)\@([\w+.]+))/$',
+        RetrieveUserView.as_view(), name='user-view'),
 
 ]
 

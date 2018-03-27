@@ -39,4 +39,4 @@ class RetrieveUserView( RetrieveAPIView):
     queryset = User.objects.all()
     model = User
     serializer_class = UserInlineSerializer
-    lookup_field = 'phone_number'
+    lookup_field = 'email'
