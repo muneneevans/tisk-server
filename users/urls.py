@@ -11,6 +11,11 @@ api_urls = [
     url(r'^(?P<email>([\w+.]+)\@([\w+.]+))/$',
         RetrieveUserView.as_view(), name='user-view'),
 
+
+    url(r'^(?P<email>([\w+.]+)\@([\w+.]+))/savings', include("savings.urls")),
+
+
+
 ]
 
 urlpatterns = [
