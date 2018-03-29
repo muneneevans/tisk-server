@@ -7,6 +7,7 @@ app_name = 'savings'
 
 api_urls = [    
     url(r'^deposits/$',  UserDepositsView.as_view(), name='user-deposits-view'),
+    url(r'^deposits/new/$',  CreateDepositView.as_view(), name='create-deposits-view'),
 ]
 
 urlpatterns = [

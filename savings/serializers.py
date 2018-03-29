@@ -18,3 +18,8 @@ class UserDepositSerializer(ModelSerializer):
         model = User
         fields = ("first_name", "last_name", "email",
                   'phone_number', "user_deposit")
+
+class CreateDepositSerializer(ModelSerializer):
+    class Meta:
+        model = Deposit
+        fields = "__all__"
