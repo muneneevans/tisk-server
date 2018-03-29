@@ -7,15 +7,12 @@ from .models import *
 from users.models import User
 
 
-class UserDepositsView(ListAPIView):
+class UserDepositsView(RetrieveAPIView):
     permission_classes = [IsAuthenticated, ]
-    model = User
     queryset = User.objects.all()
+    model = User    
     serializer_class = UserDepositSerializer
-
-    def get_queryset(self):
-        queryset = super(UserDepositsView, self).get_queryset()
-        return queryset.filter(email=self.kwargs.get('email'))
+    lookup_field = 'email'
 
 
 class CreateDepositView(CreateAPIView):
