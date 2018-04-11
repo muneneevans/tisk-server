@@ -16,7 +16,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     gender = models.CharField(_('gender'), max_length=30, blank=True)
     phone_number = models.CharField(_('phone_number'), max_length=30, blank=True)
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
+    date_modified = models.DateTimeField(('date modified'), auto_now=True)
     is_active = models.BooleanField(_('active'), default=True)
+    is_staff = models.BooleanField(('staff status'), default=False,
+                                   help_text=('Designates whether the user can log on to the site'))    
     
 
     objects = UserManager()
