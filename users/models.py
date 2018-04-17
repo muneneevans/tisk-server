@@ -18,7 +18,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     date_modified = models.DateTimeField(('date modified'), auto_now=True)
     national_id = models.CharField(_('national_id'), max_length=200, unique=True)
-    is_active = models.BooleanField(_('active'), default=True)
+    is_active = models.BooleanField(_('active'), default=False)
     is_staff = models.BooleanField(('staff status'), default=False,
                                    help_text=('Designates whether the user can log on to the site'))
 
