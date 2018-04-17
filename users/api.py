@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 
 from .serializers import *
 from .models import *
-
+from .permissions import isActivated
 
 class CreateUser(ListCreateAPIView):
     permission_classes = [AllowAny, ]
@@ -35,7 +35,7 @@ class MultipleFieldLookupMixin(object):
         return obj
 
 class RetrieveUserView( RetrieveAPIView):
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthenticated, isActivated]
     queryset = User.objects.all()
     model = User
     serializer_class = UserInlineSerializer
