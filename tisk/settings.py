@@ -12,6 +12,21 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 
+import importlib
+
+try:
+    dotenv = importlib.import_module('dotenv')
+    dotenv.load_dotenv(dotenv.find_dotenv())
+except ModuleNotFoundError:
+    pass
+
+
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
+EMAIL_PORT = os.environ.get('EMAIL_PORT', '25')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'foo@bar')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'foobar')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', False)
 
 RUNNING_DEVSERVER = True
 try:
@@ -22,7 +37,6 @@ except:
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
