@@ -41,7 +41,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         # msg.send()
 
 
-        send_mail(subject,text_content,EMAIL_HOST_USER,[created_user.email],fail_silently=False)
+        send_mail(subject,text_content,EMAIL_HOST_USER,[created_user.email],fail_silently=True)
         
         return created_user
 
