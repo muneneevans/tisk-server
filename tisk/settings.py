@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'users.apps.UsersConfig',
     'savings.apps.SavingsConfig',
+    'member_types.apps.MemberTypesConfig',
     'corsheaders',
 
 ]
@@ -104,13 +105,17 @@ WSGI_APPLICATION = 'tisk.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'tisk',
-        'USER': 'tisk_user',
-        'PASSWORD': 'tisk_password',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
+        'ENGINE': os.environ.get('DATABASE_ENGINE', 'django.db.backends.postgresql_psycopg2'),
+        'NAME': os.environ.get('DATABASE_NAME', 'tisk'),
+        'USER': os.environ.get('DATABASE_USER', 'tisk_user'),
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD', 'tisk_password'),
+        'HOST': os.environ.get('DATABASE_HOST', 'localhost'),
+        'PORT': os.environ.get('DATABASE_PORT', ''),
+    },
+    'test': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    },
 }
 
 
