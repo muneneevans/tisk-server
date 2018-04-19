@@ -5,3 +5,6 @@ class MemberType(models.Model):
     monthly_fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     description = models.TextField(blank=True, null=True)
     registration_fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
