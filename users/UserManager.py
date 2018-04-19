@@ -29,6 +29,7 @@ class UserManager(BaseUserManager):
         super_user = self._create_user(email, password, **extra_fields)
 
         super_user.is_admin = True
+        super_user.is_active = True
         super_user.is_staff = True
         super_user.is_superuser = True
         super_user.save()
