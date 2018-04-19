@@ -6,6 +6,8 @@ from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils.translation import ugettext_lazy as _
 
+import uuid
+
 from .UserManager import *
 
 
@@ -18,7 +20,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     date_modified = models.DateTimeField(('date modified'), auto_now=True)
     national_id = models.CharField(_('national_id'), max_length=200, unique=True)
-    is_active = models.BooleanField(_('active'), default=True)
+    is_active = models.BooleanField(_('active'), default=False)
     is_staff = models.BooleanField(('staff status'), default=False,
                                    help_text=('Designates whether the user can log on to the site'))
 
@@ -50,3 +52,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         Sends an email to this User.
         '''
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+
+class ActivationToken(models.Model):
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE, related_name="user")
+    token = models.CharField(max_length=6, unique=True,
+                             blank=False )
+    time_generated = models.DateTimeField(auto_now_add=True)
+    is_expired = models.BooleanField(default=False)
+    time_activated = models.DateTimeField(auto_now=True)
