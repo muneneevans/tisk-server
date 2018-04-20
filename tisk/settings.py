@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'savings.apps.SavingsConfig',
     'member_types.apps.MemberTypesConfig',
+    'members.apps.MembersConfig',
     'corsheaders',
 
 ]
@@ -118,6 +119,7 @@ DATABASES = {
     },
 }
 
+DATABASES['default'] = DATABASES[os.environ.get('DATABASE_DEFAULT', 'default')]
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators

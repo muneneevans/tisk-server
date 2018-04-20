@@ -1,6 +1,4 @@
 from django.contrib import admin
+from member_types.models import MemberType
 
-from .models import MemberType
-
-# Register your models here.
 admin.site.register(MemberType)
