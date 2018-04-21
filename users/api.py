@@ -86,7 +86,7 @@ class ActivateUser(ListAPIView):
                     }, status=401)
 
 
-class ResendActiationEmail(GenericAPIView):
+class ResendActivationEmail(GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = type('', (Serializer,),{'email': EmailField(required=True, allow_blank=False, allow_null=False)})
 

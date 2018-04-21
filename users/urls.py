@@ -13,7 +13,7 @@ api_urls = [
     url(r'(?P<email>([\w+.]+)\@([\w+.]+))/$',
         RetrieveUserView.as_view(), name='user-view'),
     url(r'(?P<email>([\w+.]+)\@([\w+.]+))/savings', include("savings.urls")),
-    url(r'send_activation_email/', ResendActiationEmail.as_view()),
+    url(r'send_activation_email/', ResendActivationEmail.as_view()),
 
 
 ]
