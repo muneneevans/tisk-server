@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.fields import EmailField
+from rest_framework.fields import EmailField, CharField
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView, GenericAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -22,25 +22,6 @@ class CreateUser(ListCreateAPIView):
             return UserInlineSerializer
         return UserCreateSerializer
 
-
-class MultipleFieldLookupMixin(object):
-    """
-    Apply this mixin to any view or viewset to get multiple field filtering
-    based on a `lookup_fields` attribute, instead of the default single field filtering.
-    """
-
-    def get_object(self):
-        queryset = self.get_queryset()             # Get the base queryset
-        queryset = self.filter_queryset(queryset)  # Apply any filter backends
-        filter = {}
-        for field in self.lookup_fields:
-            if self.kwargs[field]:  # Ignore empty fields.
-                filter[field] = self.kwargs[field]
-        obj = get_object_or_404(queryset, **filter)  # Lookup the object
-        self.check_object_permissions(self.request, obj)
-        return obj
-
-
 class RetrieveUserView(RetrieveAPIView):
     permission_classes = [IsAuthenticated, isOwner]
     queryset = User.objects.all()
@@ -49,41 +30,32 @@ class RetrieveUserView(RetrieveAPIView):
     lookup_field = 'email'
 
 
-class ActivateUser(ListAPIView):
+class ActivateUser(GenericAPIView):
     permission_classes = [AllowAny]
+    serializer_class = type('', (Serializer,),{'token': CharField(required=True, max_length=50, allow_blank=False, allow_null=False)})
 
     def post(self, request, **kwargs):
-        if request.data:
-            payload = request.data
-            required_fields = [
-                'token'
-            ]
-            for r_filter in required_fields:
-                if not r_filter in payload.keys():
-                    return JsonResponse(
-                        {
-                            'status': 'bad request',
-                            'message': "missing attribute: " + r_filter
-                        },
-                        status=400)
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            token = get_object_or_404(ActivationToken, token=payload['token'])
+        token = get_object_or_404(ActivationToken, token=serializer.validated_data['token'])
 
-            if not token.is_expired:
-                token.is_expired = True
-                token.save()
+        if not token.is_expired:
+            token.is_expired = True
+            token.save()
 
-                user = token.user
-                user.is_active = True
-                user.save()
+            user = token.user
+            user.is_active = True
+            user.save()
 
-                return JsonResponse({"message": "user activation successful"})
-            else:
-                return JsonResponse(
-                    {
-                        'status': 'invalid token',
-                        'message': "expired token"
-                    }, status=401)
+            return JsonResponse({"message": "user activation successful"})
+        else:
+            return JsonResponse(
+                {
+                    'status': 'invalid token',
+                    'message': "expired token"
+                }, status=401)
 
 
 class ResendActivationEmail(GenericAPIView):
