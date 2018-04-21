@@ -1,12 +1,14 @@
-from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
-from rest_framework.generics import CreateAPIView, ListCreateAPIView, RetrieveUpdateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, GenericAPIView
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
-from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
+from rest_framework import status
+from rest_framework.fields import EmailField
+from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView, GenericAPIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 
-from .serializers import *
-from .models import *
 from .permissions import isOwner
+from .serializers import *
 
 
 class CreateUser(ListCreateAPIView):
@@ -84,28 +86,20 @@ class ActivateUser(ListAPIView):
                     }, status=401)
 
 
-class ResendActiationEmail(APIView):
+class ResendActiationEmail(GenericAPIView):
     permission_classes = [AllowAny]
+    serializer_class = type('', (Serializer,),{'email': EmailField(required=True, allow_blank=False, allow_null=False)})
 
     def post(self, request, **kwargs):
-        payload = request.data if request.data else {}
-        required_fields = [
-            'email'
-        ]
-        for r_filter in required_fields:
-            if not r_filter in payload.keys():
-                return JsonResponse(
-                    {
-                        'status': 'bad request',
-                        'message': "missing attribute: " + r_filter
-                    },
-                    status=400)
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        user = get_object_or_404(User, email=payload['email'])
+        user = get_object_or_404(User, email=serializer.validated_data['email'])
 
         if not user.is_active:
             user.send_activation_email()
-            return JsonResponse({"message": "user activation successful"})
+            return JsonResponse({"message": "Activation email successfully sent"})
         else:
             return JsonResponse(
                 {
