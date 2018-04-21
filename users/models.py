@@ -4,10 +4,12 @@ from django.db import models
 from django.core.mail import send_mail
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
+from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext_lazy as _
 
 import uuid
 
+from tisk.settings import EMAIL_HOST_USER
 from .UserManager import *
 
 
@@ -47,11 +49,24 @@ class User(AbstractBaseUser, PermissionsMixin):
         '''
         return self.first_name
 
-    def email_user(self, subject, message, from_email=None, **kwargs):
+    def email_user(self, subject, message, from_email=EMAIL_HOST_USER, **kwargs):
         '''
         Sends an email to this User.
         '''
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+    def send_activation_email(self):
+        try:
+            user_activation_token = ActivationToken.objects.filter(user=self).order_by('-time_generated').first()
+        except:
+            user_activation_token = ActivationToken.objects.create(
+                user=self, token=get_random_string(length=6))
+            user_activation_token.save()
+        # send the token to the user
+        subject = 'Activation Code'
+        text_content = 'Welcome, the actication code for your account is %s' % (
+            user_activation_token.token)
+        self.email_user(subject, text_content, fail_silently=False)
 
 
 class ActivationToken(models.Model):

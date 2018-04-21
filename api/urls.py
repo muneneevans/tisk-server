@@ -16,13 +16,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url, include
+
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    url(r'^login/', obtain_jwt_token),
-    url(r'^refreshtoken/', refresh_jwt_token),
-    url(r'^users/', include('users.urls')),
-    url('api/', include('api.urls'))
+import users.urls
 
+urlpatterns = [
+    url( r'^(?P<version>(v1))/',include([
+        path('users/', include(users.urls.api_urls)),
+        path('auth/', include([
+            url(r'^login/', obtain_jwt_token),
+            url(r'^refreshtoken/', refresh_jwt_token),
+        ]))
+    ]))
 ]

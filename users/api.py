@@ -1,7 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
-from rest_framework.generics import CreateAPIView, ListCreateAPIView, RetrieveUpdateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView
+from rest_framework.generics import CreateAPIView, ListCreateAPIView, RetrieveUpdateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, GenericAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
+from rest_framework.views import APIView
 
 from .serializers import *
 from .models import *
@@ -81,3 +82,33 @@ class ActivateUser(ListAPIView):
                         'status': 'invalid token',
                         'message': "expired token"
                     }, status=401)
+
+
+class ResendActiationEmail(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, **kwargs):
+        payload = request.data if request.data else {}
+        required_fields = [
+            'email'
+        ]
+        for r_filter in required_fields:
+            if not r_filter in payload.keys():
+                return JsonResponse(
+                    {
+                        'status': 'bad request',
+                        'message': "missing attribute: " + r_filter
+                    },
+                    status=400)
+
+        user = get_object_or_404(User, email=payload['email'])
+
+        if not user.is_active:
+            user.send_activation_email()
+            return JsonResponse({"message": "user activation successful"})
+        else:
+            return JsonResponse(
+                {
+                    'status': 'Invalid operation',
+                    'message': "user is already activated"
+                }, status=403)
