@@ -12,6 +12,7 @@ class CreateUser(ListCreateAPIView):
     permission_classes = [AllowAny, ]
     model = User
     serializer_class = UserCreateSerializer
+    queryset = ''
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
