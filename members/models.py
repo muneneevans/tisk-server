@@ -30,6 +30,4 @@ class Member(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        sa = socket.create_connection("")
-
         return self.user.__str__()

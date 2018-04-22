@@ -20,6 +20,8 @@ from django.conf.urls import url, include
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
 import users.urls
+import member_types.urls
+import members.urls
 
 urlpatterns = [
     url( r'^(?P<version>(v1))/',include([
@@ -27,6 +29,8 @@ urlpatterns = [
         path('auth/', include([
             url(r'^login/', obtain_jwt_token),
             url(r'^refreshtoken/', refresh_jwt_token),
-        ]))
+        ])),
+        path('members/', include(members.urls.api_urls)),
+        path('member_types/', include('member_types.urls')),
     ]))
 ]
