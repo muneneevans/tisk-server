@@ -19,7 +19,7 @@ api_urls = [
 
 
     url(r'^(?P<email>([\w+.]+)\@([\w+.]+))/savings', include("savings.urls")),
-
+    url(r'^(?P<email>([\w+.]+)\@([\w+.]+))/membership', include("members.urls")),
 
 ]
 

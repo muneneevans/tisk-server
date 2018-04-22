@@ -46,6 +46,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return created_user
 
 
+
 class ActivationTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivationToken

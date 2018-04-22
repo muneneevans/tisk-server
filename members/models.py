@@ -4,7 +4,7 @@ from member_types.models import MemberType
 
 # Create your models here.
 class Member(models.Model):
-    user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
+    user = models.OneToOneField(User, on_delete=models.DO_NOTHING, related_name="user_member")
     member_type = models.OneToOneField(MemberType, on_delete=models.DO_NOTHING)
     is_msf_active = models.BooleanField(blank=True, default=False)
     msf_account = models.CharField(max_length=50, null=True, blank=True)
