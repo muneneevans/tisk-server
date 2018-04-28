@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'savings.apps.SavingsConfig',
     'member_types.apps.MemberTypesConfig',
     'members.apps.MembersConfig',
+    'api.apps.ApiConfig',
     'corsheaders',
 
 ]

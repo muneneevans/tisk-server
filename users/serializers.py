@@ -1,3 +1,4 @@
+from collections import OrderedDict
 
 from django.db import transaction
 from django.utils.crypto import get_random_string
@@ -5,7 +6,9 @@ from rest_framework import serializers
 
 from django.core.mail import EmailMessage, EmailMultiAlternatives, send_mail
 from django.conf.global_settings import EMAIL_HOST_USER
-
+import members.models
+import member_types.serializers
+import member_types.models
 from .models import *
 
 
@@ -16,14 +19,17 @@ class UserInlineSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-
+    member_type = serializers.PrimaryKeyRelatedField(many=False, queryset=member_types.models.MemberType.objects.all(), write_only=True)
     class Meta:
         model = User
         fields = ('email', 'password', 'phone_number',
-                  'first_name', 'last_name', 'national_id')
+                  'first_name', 'last_name', 'national_id', 'member_type')
 
     def create(self, validated_data):
+        member_type = validated_data.pop('member_type')
         created_user = User.objects.create_user(**validated_data)
+        member = members.models.Member(user=created_user, member_type=member_type)
+        member.save()
 
         user_activation_token = ActivationToken.objects.create(
             user=created_user, token=get_random_string(length=6))
@@ -35,24 +41,10 @@ class UserCreateSerializer(serializers.ModelSerializer):
         text_content = 'Welcome, the actication code for your account is %s' % (
             user_activation_token.token)
         html_content = '<p>The activation code is  <strong>%s</strong> message.</p>'%(user_activation_token.token)
-        # msg = EmailMultiAlternatives(
-        #     subject, text_content, EMAIL_HOST_USER, [to])
-        # msg.attach_alternative(html_content, "text/html")
-        # msg.send()
-
-
         send_mail(subject,text_content,EMAIL_HOST_USER,[created_user.email],fail_silently=False)
         
         return created_user
 
-
-
 class ActivationTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivationToken
-
-
-        
-
-
-

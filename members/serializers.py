@@ -1,13 +1,7 @@
-
 from django.db import transaction
 from rest_framework import serializers
-
-
 from .models import *
 from users.models import *
-
-
-
 class MemberInlineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
@@ -21,3 +15,7 @@ class UserMembershipSerializer(serializers.ModelSerializer):
         model = User
         fields = ('email', 'password', 'phone_number',
                   'first_name', 'last_name', 'national_id', 'user_member')
+class MemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Member
+        fields = "__all__"
