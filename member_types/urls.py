@@ -1,4 +1,5 @@
 from django.conf.urls import url, include
+from django.urls import path
 
 from .api import *
 
@@ -7,7 +8,7 @@ app_name= "member_types"
 
 
 api_urls = [
-    url(r'^$',  MemberTypesListView.as_view(), name='member-types-list-view'),
+    path(r'',  MemberTypesListView.as_view(), name='member-types-list-view'),
 ]
 
 
