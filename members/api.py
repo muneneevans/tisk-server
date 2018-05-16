@@ -2,13 +2,27 @@ import uuid
 
 from rest_framework import status
 from rest_framework.fields import CharField
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework_jwt.compat import PasswordField
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
+
+from users.models import User
+from users.permissions import isOwner
 
 from members import permissions
+from members.models import *
 from members.permissions import IsMFSInactive
+from members.serializers import UserMembershipSerializer
+
+
+class UserMembershipView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated, isOwner]
+    queryset = User.objects.all()
+    model = User
+    serializer_class = UserMembershipSerializer
+    lookup_field = 'email'
 
 class RequestMFS(GenericAPIView):
     permission_classes = [IsMFSInactive]
