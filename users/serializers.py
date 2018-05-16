@@ -28,7 +28,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         member_type = validated_data.pop('member_type')
         created_user = User.objects.create_user(**validated_data)
-        member = members.models.Member(user=created_user, member_type=member_type)
+        member = members.models.Member(user=created_user, member_type=member_type, is_msf_active=True)
         member.save()
 
         user_activation_token = ActivationToken.objects.create(
