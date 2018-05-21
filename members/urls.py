@@ -1,5 +1,5 @@
 from django.conf.urls import url, include
-from members.api import ActivateMFS, RequestMFS, UserMembershipView
+from members.api import ActivateMFS, RequestMFS, UserMembershipView, UserMFSStatus
 
 app_name = 'members'
 
@@ -12,5 +12,6 @@ api_urls = [
 
 urlpatterns = [
 
+    url(r'mfs_status/', UserMFSStatus.as_view(), name="user-mfs-status-view"),
     url(r'^$',  UserMembershipView.as_view(), name='user-membership-view'),
 ]
