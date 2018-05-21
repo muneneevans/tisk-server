@@ -19,7 +19,8 @@ class Member(models.Model):
     )
     class Meta:
         unique_together = (("user", "member_type"), )
-    user = models.OneToOneField(User, on_delete=models.DO_NOTHING, related_name="user_member")
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="user_member")
     member_type = models.ForeignKey(MemberType, on_delete=models.DO_NOTHING)
     is_msf_active = models.BooleanField(blank=True, default=False)
     msf_account = models.CharField(max_length=50, null=True, blank=True)
