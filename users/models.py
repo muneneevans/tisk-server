@@ -1,11 +1,12 @@
 from __future__ import unicode_literals
 
+from django.contrib.contenttypes import fields
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.core.mail import send_mail
-from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.models import PermissionsMixin, AbstractUser
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils.crypto import get_random_string
-from django.utils.translation import ugettext_lazy as _
 
 import uuid
 
@@ -13,46 +14,36 @@ from tisk.settings import EMAIL_HOST_USER
 from .UserManager import *
 
 
-class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(_('email address'), unique=True)
-    first_name = models.CharField(_('first name'), max_length=30, blank=True)
-    last_name = models.CharField(_('last name'), max_length=30, blank=True)
-    gender = models.CharField(_('gender'), max_length=30, blank=True)
-    phone_number = models.CharField(_('phone_number'), max_length=30, unique=True )
-    date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
-    date_modified = models.DateTimeField(('date modified'), auto_now=True)
-    national_id = models.CharField(_('national_id'), max_length=200, unique=True)
-    is_active = models.BooleanField(_('active'), default=False)
-    is_staff = models.BooleanField(('staff status'), default=False,
-                                   help_text=('Designates whether the user can log on to the site'))
+class UserManager(BaseUserManager):
+    def create_superuser(self, email, password, **kwargs):
+        account = self.create_user(email, password, **kwargs)
+        account.is_superuser = True
+        account.is_staff = True
+        account.save()
+
+        return account
+    #
+    def create_user(self, email, password=None, **kwargs):
+        if not email:
+            raise ValueError('Please provide a valid email address')
+        account = self.model(email=self.normalize_email(email))
+        account.set_password(password)
+        account.save()
+
+        return account
 
 
-    objects = UserManager()
-
+class User(AbstractUser):
+    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=50, blank=True, null=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
-
-    class Meta:
-        verbose_name = _('user')
-        verbose_name_plural = _('users')
-
-    def get_full_name(self):
-        '''
-        Returns the first_name plus the last_name, with a space in between.
-        '''
-        full_name = '%s %s' % (self.first_name, self.last_name)
-        return full_name.strip()
-
-    def get_short_name(self):
-        '''
-        Returns the short name for the user.
-        '''
-        return self.first_name
+    objects = UserManager()
 
     def email_user(self, subject, message, from_email=EMAIL_HOST_USER, **kwargs):
-        '''
+        """
         Sends an email to this User.
-        '''
+        """
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
     def send_activation_email(self):
@@ -64,7 +55,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             user_activation_token.save()
         # send the token to the user
         subject = 'Activation Code'
-        text_content = 'Welcome, the actication code for your account is %s' % (
+        text_content = 'Welcome, the activation code for your account is %s' % (
             user_activation_token.token)
         self.email_user(subject, text_content, fail_silently=False)
 
@@ -72,10 +63,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 class ActivationToken(models.Model):
     id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User,
-                             on_delete=models.CASCADE, related_name="user")
-    token = models.CharField(max_length=6, unique=True,
-                             blank=False )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=6, unique=True, blank=False )
     time_generated = models.DateTimeField(auto_now_add=True)
     is_expired = models.BooleanField(default=False)
     time_activated = models.DateTimeField(auto_now=True)

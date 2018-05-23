@@ -4,8 +4,34 @@ from member_types.models import MemberType
 import socket
 import datetime
 
-# Create your models here.
-class Member(models.Model):
+
+class Individual(models.Model):
+    class Meta:
+        abstract = True
+
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    other_names = models.CharField(max_length=255)
+    national_id = models.CharField(max_length=50, unique=True)
+    email = models.EmailField(max_length=50)
+    phone_number = models.EmailField(max_length=50)
+
+
+class Business(models.Model):
+    class Meta:
+        abstract = True
+
+    business_name = models.CharField(max_length=255)
+    registration_number = models.CharField(max_length=255)
+    business_email = models.CharField(max_length=100)
+    business_phone_number = models.CharField(max_length=50)
+    contact_name = models.CharField(max_length=255)
+    contact_phone_number = models.CharField(max_length=50)
+    contact_position = models.CharField(max_length=255)
+    contact_email = models.EmailField(max_length=100)
+
+
+class Member(Individual, Business):
     PENDING = 'Pending'
     APPROVED = 'Approved'
     REJECTED = 'Rejected'

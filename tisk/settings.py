@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'members.apps.MembersConfig',
     'api.apps.ApiConfig',
     'corsheaders',
+    'django_extensions'
 
 ]
 
