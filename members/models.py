@@ -14,7 +14,7 @@ class Individual(models.Model):
     other_names = models.CharField(max_length=255)
     national_id = models.CharField(max_length=50, unique=True)
     email = models.EmailField(max_length=50)
-    phone_number = models.EmailField(max_length=50)
+    phone_number = models.CharField(max_length=50)
 
 
 class Business(models.Model):

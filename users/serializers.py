@@ -18,14 +18,19 @@ class UserInlineSerializer(serializers.ModelSerializer):
 
 class UserCreateSerializer(serializers.ModelSerializer):
     member_type = serializers.PrimaryKeyRelatedField(many=False, queryset=member_types.models.MemberType.objects.all(), write_only=True)
+    email = serializers.EmailField(max_length=50, write_only=True)
+    password = serializers.CharField(max_length=50, write_only=True)
+
     class Meta:
-        model = User
-        fields = ('email', 'password', 'member_type')
+        model = members.models.Member
+        fields = '__all__'
 
     def create(self, validated_data):
         member_type = validated_data.pop('member_type')
-        created_user = User.objects.create_user(**validated_data)
-        member = members.models.Member(user=created_user, member_type=member_type)
+        email = validated_data.pop('email')
+        password = validated_data.pop('password')
+        created_user = User.objects.create_user(email=email, password=password)
+        member = members.models.Member(member_type=member_type, user=created_user, **validated_data)
         member.save()
 
         user_activation_token = ActivationToken.objects.create(
@@ -44,10 +49,10 @@ class UserCreateSerializer(serializers.ModelSerializer):
         header = {"Authorization": "Bearer TestAPIKey"}
         payload = {
             "Request":{
-                "mobile_number": created_user.phone_number,
-                "customer_name": created_user.first_name + " " +created_user.last_name,
-                "account_number": created_user.national_id,
-                "customer_id_number": created_user.national_id,
+                "mobile_number": member.phone_number,
+                "customer_name": member.first_name + " " +created_user.last_name,
+                "account_number": member.national_id,
+                "customer_id_number": member.national_id,
                 "registration_code": "7840",
                 "email_address": created_user.email
             }
@@ -66,10 +71,27 @@ class UserCreateSerializer(serializers.ModelSerializer):
                     member.is_msf_active = False
                 member.save()
         except:
-            raise("cannot creat MFS account")
+            # raise("cannot creat MFS account")
+            pass
 
-        return created_user
+        return member
 
-class ActivationTokenSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ActivationToken
+
+class CreateIndividualSerializer(UserCreateSerializer):
+    class Meta(UserCreateSerializer.Meta):
+        fields = ('first_name', 'last_name', 'national_id', 'phone_number',
+                  'member_type', 'email', 'password')
+
+
+class CreateBusinessSerializer(UserCreateSerializer):
+    class Meta(UserCreateSerializer.Meta):
+        fields = ('business_name', 'registration_number', 'business_email',
+                  'business_phone_number', 'contact_name', 'contact_phone_number',
+                  'contact_position', 'contact_email',
+                  'member_type', 'email', 'password')
+
+
+class CreateFutureSerializer(UserCreateSerializer):
+    class Meta(UserCreateSerializer.Meta):
+        model = members.models.Member
+        fields = ('member_type', 'email', 'password')
