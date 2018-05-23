@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'users.apps.UsersConfig',
     'savings.apps.SavingsConfig',
+    'membership_categories.apps.MembershipCategoriesConfig',
     'member_types.apps.MemberTypesConfig',
     'members.apps.MembersConfig',
     'api.apps.ApiConfig',
