@@ -28,8 +28,8 @@ urlpatterns = [
     url( r'^(?P<version>(v1))/',include([
         path('users/', include(users.urls.api_urls)),
         path('auth/', include([
-            url(r'^login/', obtain_jwt_token),
-            url(r'^refreshtoken/', refresh_jwt_token),
+            url(r'^login/?', obtain_jwt_token),
+            url(r'^refreshtoken/?', refresh_jwt_token),
         ])),
         path('members/', include(members.urls.api_urls)),
         path('member_types/', include(member_types.urls.api_urls)),

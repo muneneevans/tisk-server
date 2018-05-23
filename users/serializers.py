@@ -7,13 +7,15 @@ import requests, json
 
 import members.models
 import member_types.models
+from members.serializers import MemberInlineSerializer, UserMembershipSerializer, MemberSerializer
 from .models import *
 
 
 class UserInlineSerializer(serializers.ModelSerializer):
+    member = MemberSerializer(source='user_member')
     class Meta: 
         model = User
-        fields = "__all__"
+        fields = ('id','email', 'member')
 
 
 class UserCreateSerializer(serializers.ModelSerializer):

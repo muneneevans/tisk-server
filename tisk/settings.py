@@ -215,7 +215,7 @@ JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
 
 
-    'JWT_AUTH_HEADER_PREFIX': 'JWT',
+    # 'JWT_AUTH_HEADER_PREFIX': 'JWT',
     'JWT_AUTH_COOKIE': None,
 
 }
