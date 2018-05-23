@@ -15,6 +15,7 @@ def insert_defaults(apps, schema_editor):
     MemberType(name="Student", membership_category_id="kilobyte").save()
     MemberType(name="Futures", membership_category_id="microbyte", active=False).save()
 
+
 class Migration(migrations.Migration):
 
     initial = True

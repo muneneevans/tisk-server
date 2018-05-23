@@ -1,17 +1,11 @@
-from collections import OrderedDict
-
-from django.db import transaction
-from django.utils.crypto import get_random_string
 from rest_framework import serializers
 
-from django.core.mail import EmailMessage, EmailMultiAlternatives, send_mail
 from django.conf.global_settings import EMAIL_HOST_USER
 
 import requests, json
 
 
 import members.models
-import member_types.serializers
 import member_types.models
 from .models import *
 
