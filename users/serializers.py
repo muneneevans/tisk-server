@@ -26,8 +26,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
     member_type = serializers.PrimaryKeyRelatedField(many=False, queryset=member_types.models.MemberType.objects.all(), write_only=True)
     class Meta:
         model = User
-        fields = ('email', 'password', 'phone_number',
-                  'first_name', 'last_name', 'national_id', 'member_type')
+        fields = ('email', 'password', 'member_type')
 
     def create(self, validated_data):
         member_type = validated_data.pop('member_type')
