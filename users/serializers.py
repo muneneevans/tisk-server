@@ -17,9 +17,14 @@ class UserInlineSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    member_type = serializers.PrimaryKeyRelatedField(many=False, queryset=member_types.models.MemberType.objects.all(), write_only=True)
+    member_type = serializers.PrimaryKeyRelatedField(many=False, queryset=member_types.models.MemberType.objects.all())
     email = serializers.EmailField(max_length=50, write_only=True)
     password = serializers.CharField(max_length=50, write_only=True)
+
+    def validate(self, attrs):
+        if User.objects.filter(email=attrs['email']).exists():
+            raise serializers.ValidationError({'email': "user with email({}) already exists".format(attrs['email'])})
+        return super(serializers.ModelSerializer, self).validate(attrs)
 
     class Meta:
         model = members.models.Member
@@ -78,12 +83,14 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 
 class CreateIndividualSerializer(UserCreateSerializer):
+    member_type = serializers.PrimaryKeyRelatedField(many=False, queryset=member_types.models.MemberType.objects.filter(type='Individual'))
     class Meta(UserCreateSerializer.Meta):
         fields = ('first_name', 'last_name', 'national_id', 'phone_number',
                   'member_type', 'email', 'password')
 
 
 class CreateBusinessSerializer(UserCreateSerializer):
+    member_type = serializers.PrimaryKeyRelatedField(many=False, queryset=member_types.models.MemberType.objects.filter(type='Business'))
     class Meta(UserCreateSerializer.Meta):
         fields = ('business_name', 'registration_number', 'business_email',
                   'business_phone_number', 'contact_name', 'contact_phone_number',
@@ -92,6 +99,7 @@ class CreateBusinessSerializer(UserCreateSerializer):
 
 
 class CreateFutureSerializer(UserCreateSerializer):
+    member_type = serializers.PrimaryKeyRelatedField(many=False, queryset=member_types.models.MemberType.objects.filter(type='Future'))
     class Meta(UserCreateSerializer.Meta):
         model = members.models.Member
         fields = ('member_type', 'email', 'password')
