@@ -23,7 +23,7 @@ class MemberType(models.Model):
     registration_fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     share_capital = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     active = models.BooleanField(default=True)
-    thumbnail = models.ImageField(upload_to=get_image_path, null=True, blank=True)
+    thumbnail = models.FileField(upload_to=get_image_path, null=True, blank=True)
     color = ColorField(null=True, blank=True)
     type = models.CharField(max_length=20, choices=TYPE_CHOICES, null=True, blank=True)
 
