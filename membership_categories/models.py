@@ -14,3 +14,4 @@ class MembershipCategory(models.Model):
     active = models.BooleanField(default=True)
     thumbnail = models.FileField(upload_to=get_image_path, null=True, blank=True)
     color = ColorField(null=True, blank=True)
+    order_number = models.IntegerField(null=True,default=1)
