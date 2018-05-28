@@ -21,7 +21,7 @@ class CreateUser(ListCreateAPIView):
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return UserInlineSerializer
-        return UserCreateSerializer
+        return self.serializer_class
 
 class RetrieveUserView(RetrieveAPIView):
     permission_classes = [IsAuthenticated, isOwner]
@@ -81,4 +81,14 @@ class ResendActivationEmail(GenericAPIView):
                 }, status=403)
 
 
+class CreateIndividual(CreateUser):
+    serializer_class = CreateIndividualSerializer
+
+
+class CreateBusiness(CreateUser):
+    serializer_class = CreateBusinessSerializer
+
+
+class CreateFuture(CreateUser):
+    serializer_class = CreateBusinessSerializer
 

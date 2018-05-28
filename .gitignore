@@ -3,3 +3,5 @@
 .idea
 .venv
 *.sqlite*
+media/
+static/

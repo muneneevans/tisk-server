@@ -19,6 +19,7 @@ from django.conf.urls import url, include
 
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
+import membership_categories.urls
 import users.urls
 import member_types.urls
 import members.urls
@@ -27,10 +28,11 @@ urlpatterns = [
     url( r'^(?P<version>(v1))/',include([
         path('users/', include(users.urls.api_urls)),
         path('auth/', include([
-            url(r'^login/', obtain_jwt_token),
-            url(r'^refreshtoken/', refresh_jwt_token),
+            url(r'^login/?', obtain_jwt_token),
+            url(r'^refreshtoken/?', refresh_jwt_token),
         ])),
         path('members/', include(members.urls.api_urls)),
         path('member_types/', include(member_types.urls.api_urls)),
+        path('membership_categories/', include(membership_categories.urls.api_urlpatterns)),
     ]))
 ]

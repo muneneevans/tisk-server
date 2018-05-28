@@ -62,12 +62,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'users.apps.UsersConfig',
     'savings.apps.SavingsConfig',
+    'membership_categories.apps.MembershipCategoriesConfig',
     'member_types.apps.MemberTypesConfig',
     'members.apps.MembersConfig',
     'api.apps.ApiConfig',
     'corsheaders',
-    'django_extensions'
-
+    'django_extensions',
+    'colorfield',
 ]
 
 MIDDLEWARE = [
@@ -214,7 +215,7 @@ JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
 
 
-    'JWT_AUTH_HEADER_PREFIX': 'JWT',
+    # 'JWT_AUTH_HEADER_PREFIX': 'JWT',
     'JWT_AUTH_COOKIE': None,
 
 }
@@ -224,7 +225,7 @@ JWT_AUTH = {
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+
 # STATIC_URL = '/static/'
 
 # Extra places for collectstatic to find static files.
@@ -236,6 +237,7 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 if not RUNNING_DEVSERVER:
 	import dj_database_url

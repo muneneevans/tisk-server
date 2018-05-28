@@ -1,5 +1,5 @@
+from django.conf import settings
 from django.db import models
-from users.models import User
 from member_types.models import MemberType
 import socket
 import datetime
@@ -14,7 +14,7 @@ class Individual(models.Model):
     other_names = models.CharField(max_length=255)
     national_id = models.CharField(max_length=50, unique=True)
     email = models.EmailField(max_length=50)
-    phone_number = models.EmailField(max_length=50)
+    phone_number = models.CharField(max_length=50)
 
 
 class Business(models.Model):
@@ -45,8 +45,7 @@ class Member(Individual, Business):
     )
     class Meta:
         unique_together = (("user", "member_type"), )
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="user_member")
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="user_member")
     member_type = models.ForeignKey(MemberType, on_delete=models.DO_NOTHING)
     is_msf_active = models.BooleanField(blank=True, default=False)
     msf_account = models.CharField(max_length=50, null=True, blank=True)
