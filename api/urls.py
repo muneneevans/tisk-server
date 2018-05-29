@@ -23,13 +23,14 @@ import membership_categories.urls
 import users.urls
 import member_types.urls
 import members.urls
+from users.api import TiskObtainJSONWebToken
 
 urlpatterns = [
     url( r'^(?P<version>(v1))/',include([
         path('users/', include(users.urls.api_urls)),
         path('auth/', include([
             url(r'^login/?', obtain_jwt_token),
-            url(r'^refreshtoken/?', refresh_jwt_token),
+            url(r'^refreshtoken/?', TiskObtainJSONWebToken.as_view()),
         ])),
         path('members/', include(members.urls.api_urls)),
         path('member_types/', include(member_types.urls.api_urls)),

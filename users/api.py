@@ -6,11 +6,15 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework_jwt.compat import PasswordField
+from rest_framework_jwt.views import ObtainJSONWebToken
 
 from members.permissions import IsMFSInactive
-from .permissions import isOwner
+from .permissions import isOwner, isActivated
 from .serializers import *
 
+
+class TiskObtainJSONWebToken(ObtainJSONWebToken):
+    permission_classes = (isActivated,)
 
 class CreateUser(ListCreateAPIView):
     permission_classes = [AllowAny, ]
