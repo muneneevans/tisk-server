@@ -48,6 +48,7 @@ class Member(Individual, Business):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="user_member")
     member_type = models.ForeignKey(MemberType, on_delete=models.DO_NOTHING)
     is_msf_active = models.BooleanField(blank=True, default=False)
+    is_registartion_fee_paid = models.BooleanField(blank=False, default=False)
     msf_account = models.CharField(max_length=50, null=True, blank=True)
     status = models.CharField(choices=STATUS_CHOICES, default=PENDING, max_length=30)
     created_at = models.DateTimeField(auto_now_add=True)
