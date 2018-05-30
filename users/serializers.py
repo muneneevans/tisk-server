@@ -10,6 +10,11 @@ import member_types.models
 from members.serializers import MemberInlineSerializer, UserMembershipSerializer, MemberSerializer
 from .models import *
 
+#for sending dynamic email
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+
 
 class UserInlineSerializer(serializers.ModelSerializer):
     member = MemberSerializer(source='user_member')
@@ -47,13 +52,23 @@ class UserCreateSerializer(serializers.ModelSerializer):
         user_activation_token.save()
 
 
-        #send the token to the user
+        #send the  verification code to the user
+        # subject, from_email, to = 'activation code', 'from@example.com', 'to@example.com'
+        # text_content = 'Welcome, the activation code for your account is %s' % (
+        #     user_activation_token.token)
+        # html_content = '<p>The activation code is  <strong>%s</strong> message.</p>'%(user_activation_token.token)
+        # send_mail(subject,text_content,EMAIL_HOST_USER,[created_user.email],fail_silently=False)
         subject, from_email, to = 'activation code', 'from@example.com', 'to@example.com'
-        text_content = 'Welcome, the actication code for your account is %s' % (
-            user_activation_token.token)
-        html_content = '<p>The activation code is  <strong>%s</strong> message.</p>'%(user_activation_token.token)
-        send_mail(subject,text_content,EMAIL_HOST_USER,[created_user.email],fail_silently=False)
-        
+        context = {
+            'user' : created_user.first_name ,
+            'code' : user_activation_token.token,
+        }
+        html_content = render_to_string('mailtemplate.html', context)
+        text_content = strip_tags(html_content)
+        message = EmailMultiAlternatives(subject, text_content, EMAIL_HOST_USER, [created_user.email])
+        message.attach_alternative(html_content, "text/html")
+        message.send()
+
         #register on mfs
         header = {"Authorization": "Bearer TestAPIKey"}
         payload = {
