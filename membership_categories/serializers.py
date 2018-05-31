@@ -1,12 +1,13 @@
 import rest_framework.serializers
-
-from member_types.models import MemberType
-from member_types.serializers import MemberTypeInlineSerializer
 from membership_categories.models import MembershipCategory
 
 
-class MembershipCategorySerializer(rest_framework.serializers.ModelSerializer):
-    member_types = MemberTypeInlineSerializer(source='membertype_set', many=True)
+class MembershipCategoryInlineSerializer(rest_framework.serializers.ModelSerializer):
     class Meta:
         model = MembershipCategory
         fields = "__all__"
+
+
+class MembershipCategorySerializer(MembershipCategoryInlineSerializer):
+    from member_types.serializers import MemberTypeInlineSerializer
+    member_types = MemberTypeInlineSerializer(source='membertype_set', many=True)
