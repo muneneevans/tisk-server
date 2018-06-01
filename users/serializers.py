@@ -113,7 +113,7 @@ class CreateIndividualSerializer(UserCreateSerializer):
 class CreateBusinessSerializer(UserCreateSerializer):
     member_type = serializers.PrimaryKeyRelatedField(many=False, queryset=member_types.models.MemberType.objects.filter(type='Business'))
     class Meta(UserCreateSerializer.Meta):
-        fields = ('business_name', 'registration_number', 'business_email',
+        fields = ('business_name', 'registration_number', 'email',
                   'business_phone_number', 'contact_name', 'contact_phone_number',
                   'contact_position', 'contact_email',
                   'member_type', 'email', 'password')
