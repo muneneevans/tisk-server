@@ -66,3 +66,62 @@ class UserDepoistStatusView(ListAPIView):
                         'message': "unable to reach MFS"
                     },
                     status=400)
+
+
+class MakeTransactionView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, **kwargs):
+        #ensure all parameters are provided
+        if request.data:
+            filters = request.data
+            required_filters = [
+                'amount', 'transaction_type'
+            ]
+            for r_filter in required_filters:
+                if not r_filter in filters.keys():
+                    return JsonResponse(
+                        {
+                            'status': 'bad request',
+                            'message': "missing attribute: " + r_filter
+                        },
+                        status=400)
+
+        member = Member.objects.filter(user=request.user)[0]
+
+        if member:
+            # get mobile phone details and request for deposit status
+
+            header = {"Authorization": "Bearer TestAPIKey"}
+            payload = {
+                "Request": {
+                    "mobile_number": member.phone_number,
+                    "amount": request.data["amount"],
+                    "transaction_type": request.data["transaction_type"]
+                }
+            }
+
+            r = requests.post("https://mobiloantest.mfs.co.ke/api/v1/account_transaction",
+                              data=json.dumps(payload), headers=header)
+
+            try:
+                if(r.status_code == 200):
+                    response = r.json()
+                    if(response["Response"]['status_code'] == 200):
+                        return JsonResponse(response['Response'])
+                    else:
+                        return JsonResponse(
+                            {
+                                'message': "unable to reach MFS"
+                            },
+                            status=400)
+
+            except:
+                return JsonResponse(
+                    {
+                        'message': "unable to reach MFS"
+                    },
+                    status=400)
+        else:                        
+            return JsonResponse({'parameters': "empty"})
+        # get the user details from the request
