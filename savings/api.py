@@ -11,6 +11,7 @@ from .serializers import *
 from .models import *
 from users.models import User
 from members.models import Member
+from savings.lib import get_registration_total
 
 
 class UserDepositsView(RetrieveAPIView):
@@ -68,11 +69,78 @@ class UserDepoistStatusView(ListAPIView):
                     status=400)
 
 
+class UserRegistrationStatusView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, **kwargs):
+        # get the user details from the request
+        member = Member.objects.filter(user=request.user)[0]
+
+        if member:
+            # get mobile phone details and request for deposit status
+
+            header = {"Authorization": "Bearer TestAPIKey"}
+            payload = {
+                "Request": {
+                    "mobile_number": member.phone_number
+                }
+            }
+
+            r = requests.post("https://mobiloantest.mfs.co.ke/api/v1/depositstatus",
+                              data=json.dumps(payload), headers=header)
+
+            try:            
+                if(r.status_code == 200):
+                    response = r.json()
+                    if(response["Response"]['status_code'] == 200):
+                        # find all registration transactions
+                        paid_registration_fees = get_registration_total(
+                            response["Response"]['transactions'])
+                        
+                        # import pdb
+                        # pdb.set_trace()
+                        registration_fee = float(member.member_type.registration_fee)
+                        if paid_registration_fees > registration_fee:
+                            member.is_registartion_fee_paid = True
+                            member.save()
+                            return JsonResponse(
+                                {
+                                    'status': "success",
+                                    "is_registartion_fee_paid": True,
+                                    'message': "Registration fees fully paid"
+                                },
+                                status=200)
+                        else:
+                            return JsonResponse(
+                                {
+                                    'status': "incomplete",
+                                    "is_registartion_fee_paid": False,
+                                    'message': "Registration fees unpaid",
+                                    "areas": registration_fee - paid_registration_fees
+                                },
+                                status=200)
+
+                    else:
+                        return JsonResponse(
+                            {
+                                'message': "unable to reach MFS"
+                            },
+                            status=400)
+            except:
+                return JsonResponse(
+                    {
+                        'message': "unable to reach MFS"
+                    },
+                    status=400)
+
+
+            
+
 class MakeTransactionView(ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, **kwargs):
-        #ensure all parameters are provided
+        # ensure all parameters are provided
         if request.data:
             filters = request.data
             required_filters = [
@@ -122,6 +190,6 @@ class MakeTransactionView(ListAPIView):
                         'message': "unable to reach MFS"
                     },
                     status=400)
-        else:                        
+        else:
             return JsonResponse({'parameters': "empty"})
         # get the user details from the request
