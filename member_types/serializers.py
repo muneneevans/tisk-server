@@ -7,3 +7,8 @@ class MemberTypeInlineSerializer(ModelSerializer):
     class Meta:
         model = MemberType
         fields = "__all__"
+
+
+class MemberTypeSerializer(MemberTypeInlineSerializer):
+    from membership_categories.serializers import MembershipCategoryInlineSerializer
+    membership_category = MembershipCategoryInlineSerializer()

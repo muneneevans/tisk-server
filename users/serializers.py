@@ -7,6 +7,7 @@ import requests, json
 
 import members.models
 import member_types.models
+from member_types.serializers import MemberTypeSerializer
 from members.serializers import MemberInlineSerializer, UserMembershipSerializer, MemberSerializer
 from .models import *
 
@@ -18,9 +19,10 @@ from django.utils.html import strip_tags
 
 class UserInlineSerializer(serializers.ModelSerializer):
     member = MemberSerializer(source='user_member')
+    member_type = MemberTypeSerializer(source='user_member.member_type')
     class Meta: 
         model = User
-        fields = ('id','email', 'member')
+        fields = ('id','email', 'member', 'member_type')
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -111,7 +113,7 @@ class CreateIndividualSerializer(UserCreateSerializer):
 class CreateBusinessSerializer(UserCreateSerializer):
     member_type = serializers.PrimaryKeyRelatedField(many=False, queryset=member_types.models.MemberType.objects.filter(type='Business'))
     class Meta(UserCreateSerializer.Meta):
-        fields = ('business_name', 'registration_number', 'business_email',
+        fields = ('business_name', 'registration_number', 'email',
                   'business_phone_number', 'contact_name', 'contact_phone_number',
                   'contact_position', 'contact_email',
                   'member_type', 'email', 'password')
