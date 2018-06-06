@@ -99,7 +99,8 @@ class UserRegistrationStatusView(ListAPIView):
                         
                         # import pdb
                         # pdb.set_trace()
-                        registration_fee = float(member.member_type.registration_fee)
+                        registration_fee = float(
+                            member.member_type.membership_category.registration_fee)
                         if paid_registration_fees > registration_fee:
                             member.is_registartion_fee_paid = True
                             member.save()
