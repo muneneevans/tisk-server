@@ -6,6 +6,14 @@ import datetime
 
 
 class Individual(models.Model):
+    MALE = 'Male'
+    FEMALE = 'Female'
+    
+
+    GENDER_CHOICES = (
+        (MALE, 'Male'),
+        (FEMALE, 'Female'),    
+    )
     class Meta:
         abstract = True
 
@@ -14,6 +22,8 @@ class Individual(models.Model):
     other_names = models.CharField(max_length=255)
     national_id = models.CharField(max_length=50, unique=True)
     phone_number = models.CharField(max_length=50)
+    gender = models.CharField(choices=GENDER_CHOICES,
+                              blank=True, max_length=30)
 
 
 class Business(models.Model):
