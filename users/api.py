@@ -17,6 +17,8 @@ from members.permissions import IsMFSInactive
 from .permissions import isOwner, isActivated
 from .serializers import *
 
+from members.models import Member
+
 
 class TiskObtainJSONWebToken(ObtainJSONWebToken):
     permission_classes = (isActivated,)
@@ -63,10 +65,16 @@ class ActivateUser(GenericAPIView):
             user.is_active = True
             user.save()
 
+            member = Member.objects.filter(user=user)[0]
+
+            name = ""
+            if member:
+                name = member.first_name
+
             # send welcome email
             subject = 'Welcome to Tisk'
             context = {
-                'user': "",
+                'user': name,
             }
             html_content = render_to_string('welcome_message.html', context)
             text_content = strip_tags(html_content)
