@@ -62,7 +62,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         # send_mail(subject,text_content,EMAIL_HOST_USER,[created_user.email],fail_silently=False)
         subject, from_email, to = 'activation code', 'from@example.com', 'to@example.com'
         context = {
-            'user' : created_user.first_name ,
+            'user' : member.first_name ,
             'code' : user_activation_token.token,
         }
         html_content = render_to_string('mailtemplate.html', context)
