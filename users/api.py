@@ -1,4 +1,9 @@
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django.shortcuts import get_object_or_404
+from django.conf.global_settings import EMAIL_HOST_USER
+
 from rest_framework import status
 from rest_framework.fields import EmailField, CharField
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, GenericAPIView
@@ -16,6 +21,7 @@ from .serializers import *
 class TiskObtainJSONWebToken(ObtainJSONWebToken):
     permission_classes = (isActivated,)
 
+
 class CreateUser(ListCreateAPIView):
     permission_classes = [AllowAny, ]
     model = User
@@ -27,6 +33,7 @@ class CreateUser(ListCreateAPIView):
             return UserInlineSerializer
         return self.serializer_class
 
+
 class RetrieveUserView(RetrieveAPIView):
     permission_classes = [IsAuthenticated, isOwner]
     queryset = User.objects.all()
@@ -37,14 +44,16 @@ class RetrieveUserView(RetrieveAPIView):
 
 class ActivateUser(GenericAPIView):
     permission_classes = [AllowAny]
-    serializer_class = type('', (Serializer,),{'token': CharField(required=True, max_length=50, allow_blank=False, allow_null=False)})
+    serializer_class = type('', (Serializer,), {'token': CharField(
+        required=True, max_length=50, allow_blank=False, allow_null=False)})
 
     def post(self, request, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        token = get_object_or_404(ActivationToken, token=serializer.validated_data['token'])
+        token = get_object_or_404(
+            ActivationToken, token=serializer.validated_data['token'])
 
         if not token.is_expired:
             token.is_expired = True
@@ -53,6 +62,18 @@ class ActivateUser(GenericAPIView):
             user = token.user
             user.is_active = True
             user.save()
+
+            # send welcome email
+            subject = 'Welcome to Tisk'
+            context = {
+                'user': "",
+            }
+            html_content = render_to_string('welcome_message.html', context)
+            text_content = strip_tags(html_content)
+            message = EmailMultiAlternatives(
+                subject, text_content, EMAIL_HOST_USER, [user.email])
+            message.attach_alternative(html_content, "text/html")
+            message.send()
 
             return Response({"message": "user activation successful"})
         else:
@@ -65,14 +86,16 @@ class ActivateUser(GenericAPIView):
 
 class ResendActivationEmail(GenericAPIView):
     permission_classes = [AllowAny]
-    serializer_class = type('', (Serializer,),{'email': EmailField(required=True, allow_blank=False, allow_null=False)})
+    serializer_class = type('', (Serializer,), {'email': EmailField(
+        required=True, allow_blank=False, allow_null=False)})
 
     def post(self, request, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        user = get_object_or_404(User, email=serializer.validated_data['email'])
+        user = get_object_or_404(
+            User, email=serializer.validated_data['email'])
 
         if not user.is_active:
             user.send_activation_email()
@@ -95,4 +118,3 @@ class CreateBusiness(CreateUser):
 
 class CreateFuture(CreateUser):
     serializer_class = CreateBusinessSerializer
-
