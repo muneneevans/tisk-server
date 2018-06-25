@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_extensions',
     'colorfield',
+    'dashboard',
 ]
 
 MIDDLEWARE = [
@@ -111,10 +112,10 @@ DATABASES = {
     'default': {
         'ENGINE': os.environ.get('DATABASE_ENGINE', 'django.db.backends.postgresql_psycopg2'),
         'NAME': os.environ.get('DATABASE_NAME', 'tisk'),
-        'USER': os.environ.get('DATABASE_USER', 'tisk_user'),
-        'PASSWORD': os.environ.get('DATABASE_PASSWORD', 'tisk_password'),
+        'USER': os.environ.get('DATABASE_USER', 'stevew'),
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD', '0012'),
         'HOST': os.environ.get('DATABASE_HOST', 'localhost'),
-        'PORT': os.environ.get('DATABASE_PORT', ''),
+        'PORT': os.environ.get('DATABASE_PORT', '5432'),
     },
     'test': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -226,14 +227,12 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
-# STATIC_URL = '/static/'
 
 # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, 'static'),
+    os.path.join(BASE_DIR, 'statics'),
 )
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
-
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

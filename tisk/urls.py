@@ -19,9 +19,11 @@ from django.conf.urls import url, include
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from django.conf.urls.static import static
 from django.conf import settings
+from dashboard.views import DashboardTemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('dashboard/', DashboardTemplateView.as_view(), name='dashboard'),
     url(r'^login/', obtain_jwt_token),
     url(r'^refreshtoken/', refresh_jwt_token),
     url(r'^users/', include('users.urls')),
