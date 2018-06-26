@@ -10,8 +10,9 @@ class DashboardTemplateView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['members_no'] = Member.objects.count()
-        context['new_members_last_seven_days'] = Member.objects.filter(created_at__day__gte=7).count()
-        context['new_members_last_thirty_days'] = Member.objects.filter(created_at__day__gte=30).count()
+        context['new_members_last_seven_days'] = Member.objects.filter(created_at__day__lte=7).count()
+        context['new_members_last_thirty_days'] = Member.objects.filter(created_at__day__lte=30).count()
+        context['members_active'] = Member.objects.filter(is_msf_active=True).count()
         context['member_type_investor_business'] = MemberType.objects.get(name='Business Investor').member_set.count()
         context['member_type_investor_individual'] = MemberType.objects.get(name='Individual').member_set.count()
         context['member_type_business'] = MemberType.objects.get(name='Business').member_set.count()
