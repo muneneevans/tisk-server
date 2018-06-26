@@ -23,7 +23,7 @@ from dashboard.views import DashboardTemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('dashboard/', DashboardTemplateView.as_view(), name='dashboard'),
+    path('', DashboardTemplateView.as_view(), name='dashboard'),
     path('accounts/', include('django.contrib.auth.urls')),
     url(r'^login/', obtain_jwt_token),
     url(r'^refreshtoken/', refresh_jwt_token),
