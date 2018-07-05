@@ -3,6 +3,8 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.shortcuts import get_object_or_404
 from django.conf.global_settings import EMAIL_HOST_USER
+from django.http import JsonResponse
+
 
 from rest_framework import status
 from rest_framework.fields import EmailField, CharField
@@ -14,10 +16,11 @@ from rest_framework_jwt.compat import PasswordField
 from rest_framework_jwt.views import ObtainJSONWebToken
 
 from members.permissions import IsMFSInactive
+from members.models import Member
+
 from .permissions import isOwner, isActivated
 from .serializers import *
-
-from members.models import Member
+from .models import User, PasswordRecoveryToken
 
 
 class TiskObtainJSONWebToken(ObtainJSONWebToken):
@@ -90,6 +93,63 @@ class ActivateUser(GenericAPIView):
                     'status': 'invalid token',
                     'message': "expired token"
                 }, status=401)
+
+
+class CreatePasswordRecoveryCode(GenericAPIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, **kwargs):
+        # ensure email has been provided
+        if request.data:
+            parameters = request.data
+            required_filters = [
+                'email'
+            ]
+            for r_filter in required_filters:
+                if not r_filter in parameters.keys():
+                    return JsonResponse(
+                        {
+                            'status': 'bad request',
+                            'message': "missing attribute: " + r_filter
+                        },
+                        status=400)
+
+
+            requesting_user = User.objects.filter(
+                email=request.data['email']).first()
+
+            if requesting_user:
+                # create the new reset token
+                recovery_token = PasswordRecoveryToken.objects.create(
+                    user=requesting_user, token=get_random_string(length=6))
+                recovery_token.save()
+
+                # send an email to the user with that token
+                subject = 'Password recovery code'
+                context = {
+                    'email': requesting_user.email,
+                    'code': recovery_token.token,
+                }
+                html_content = render_to_string('password_recovery.html', context)
+                text_content = strip_tags(html_content)
+                message = EmailMultiAlternatives(
+                    subject, text_content, EMAIL_HOST_USER, [requesting_user.email])
+                message.attach_alternative(html_content, "text/html")
+                message.send()
+
+                return JsonResponse(
+                    {
+                        'status': 'Success',
+                        'message': "password recovery code sent"
+                    },
+                    status=200)
+            else:
+                return JsonResponse(
+                    {
+                        'status': 'missing user',
+                        'message': "user not found"
+                    },
+                    status=404)
 
 
 class ResendActivationEmail(GenericAPIView):

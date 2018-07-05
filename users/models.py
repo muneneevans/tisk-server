@@ -68,3 +68,12 @@ class ActivationToken(models.Model):
     time_generated = models.DateTimeField(auto_now_add=True)
     is_expired = models.BooleanField(default=False)
     time_activated = models.DateTimeField(auto_now=True)
+
+class PasswordRecoveryToken(models.Model):
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=6, unique=True, blank=False )
+    time_generated = models.DateTimeField(auto_now_add=True)
+    is_expired = models.BooleanField(default=False)
+    time_activated = models.DateTimeField(auto_now=True)

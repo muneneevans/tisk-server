@@ -17,6 +17,7 @@ api_urls = [
     url(r'^(?P<email>([\w+.]+)\@([\w+.]+))/savings', include("savings.urls")),
     url(r'^(?P<email>([\w+.]+)\@([\w+.]+))/membership/',include("members.urls")),
     url(r'send_activation_email/', ResendActivationEmail.as_view()),
+    url(r'recover_password/', CreatePasswordRecoveryCode.as_view(), name='recover-password-view'),
 ]
 
 urlpatterns = [
