@@ -3,6 +3,7 @@ import json
 import requests
 
 from django.http import HttpResponse, JsonResponse
+from django.conf import settings
 
 from rest_framework import status
 from rest_framework.fields import CharField
@@ -41,9 +42,9 @@ class RequestMFS(GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         if not request.user.check_password(serializer.validated_data['password']):
             return Response({
-                    'status': 'Invalid operation',
-                    'message': "Invalid password"
-                }, status=400)
+                'status': 'Invalid operation',
+                'message': "Invalid password"
+            }, status=400)
 
         member = request.user.member
         # TODO: Add code to register MFS account
@@ -69,11 +70,11 @@ class ActivateMFS(GenericAPIView):
 
 
 class UserMFSStatus(GenericAPIView):
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, ]
 
     def get(self, request, **kwargs):
         # request mfs details
-        # import pdb 
+        # import pdb
         # pdb.set_trace()
         user = request.user
 
@@ -84,7 +85,7 @@ class UserMFSStatus(GenericAPIView):
             }
         }
 
-        r = requests.post("https://mobiloantest.mfs.co.ke/api/v1/status",
+        r = requests.post(settings.MFS_ENDPOINT+"/api/v1/status",
                           data=json.dumps(payload), headers=header)
 
         try:
@@ -93,11 +94,10 @@ class UserMFSStatus(GenericAPIView):
                 if(response["Response"]['status_code'] == 200):
                     return JsonResponse(response)
                 else:
-                    return JsonResponse( {
+                    return JsonResponse({
                         'status': 'Not found',
                         'message': "unable to get user information"
-                    }, status = 404)     
+                    }, status=404)
         except:
             raise("cannot creat MFS account")
         return HttpResponse("")
-

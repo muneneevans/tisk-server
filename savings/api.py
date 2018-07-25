@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from rest_framework.generics import CreateAPIView, ListCreateAPIView, RetrieveUpdateAPIView, ListAPIView, RetrieveAPIView
@@ -46,7 +47,7 @@ class UserDepoistStatusView(ListAPIView):
                 }
             }
 
-            r = requests.post("https://mobiloantest.mfs.co.ke/api/v1/depositstatus",
+            r = requests.post(settings.MFS_ENDPOINT+"/api/v1/depositstatus",
                               data=json.dumps(payload), headers=header)
 
             try:
@@ -86,17 +87,17 @@ class UserRegistrationStatusView(ListAPIView):
                 }
             }
 
-            r = requests.post("https://mobiloantest.mfs.co.ke/api/v1/depositstatus",
+            r = requests.post(settings.MFS_ENDPOINT+"/api/v1/depositstatus",
                               data=json.dumps(payload), headers=header)
 
-            try:            
+            try:
                 if(r.status_code == 200):
                     response = r.json()
                     if(response["Response"]['status_code'] == 200):
                         # find all registration transactions
                         paid_registration_fees = get_registration_total(
                             response["Response"]['transactions'])
-                        
+
                         # import pdb
                         # pdb.set_trace()
                         registration_fee = float(
@@ -135,8 +136,6 @@ class UserRegistrationStatusView(ListAPIView):
                     status=400)
 
 
-            
-
 class MakeTransactionView(ListAPIView):
     permission_classes = [IsAuthenticated]
 
@@ -170,7 +169,7 @@ class MakeTransactionView(ListAPIView):
                 }
             }
 
-            r = requests.post("https://mobiloantest.mfs.co.ke/api/v1/account_transaction",
+            r = requests.post(settings.MFS_ENDPOINT+"/api/v1/account_transaction",
                               data=json.dumps(payload), headers=header)
 
             try:

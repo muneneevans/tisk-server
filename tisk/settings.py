@@ -21,12 +21,15 @@ except ModuleNotFoundError:
     pass
 
 
-EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_BACKEND = os.environ.get(
+    'EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
 EMAIL_PORT = os.environ.get('EMAIL_PORT', '25')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'foo@bar')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'foobar')
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', False)
+MFS_ENDPOINT = os.environ.get(
+    'MFS_ENDPOINT', 'https://mobiloantest.mfs.co.ke')
 
 RUNNING_DEVSERVER = True
 try:
@@ -48,6 +51,7 @@ SECRET_KEY = 's5wb7sk5jk+e(1u^!r#+!4a(@&wsx8hn^iwp)x5uoc-qvbfzq5'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+
 
 
 # Application definition
@@ -88,7 +92,8 @@ ROOT_URLCONF = 'tisk.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')], #link templates for email
+        # link templates for email
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -177,7 +182,7 @@ AUTH_USER_MODEL = 'users.User'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-#auth backend
+# auth backend
 AUTHENTICATION_BACKENDS = (
     ('django.contrib.auth.backends.ModelBackend'),
 )
@@ -221,7 +226,7 @@ JWT_AUTH = {
 }
 
 
-#heroku deployment
+# heroku deployment
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
@@ -240,6 +245,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 if not RUNNING_DEVSERVER:
-	import dj_database_url
-	db_from_env = dj_database_url.config()
-	DATABASES['default'].update(db_from_env)
+    import dj_database_url
+    db_from_env = dj_database_url.config()
+    DATABASES['default'].update(db_from_env)
