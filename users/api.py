@@ -1,9 +1,12 @@
+from datetime import timedelta
+
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.shortcuts import get_object_or_404
 from django.conf.global_settings import EMAIL_HOST_USER
 from django.http import JsonResponse
+from django.utils import timezone
 
 
 from rest_framework import status
@@ -114,7 +117,6 @@ class CreatePasswordRecoveryCode(GenericAPIView):
                         },
                         status=400)
 
-
             requesting_user = User.objects.filter(
                 email=request.data['email']).first()
 
@@ -130,7 +132,8 @@ class CreatePasswordRecoveryCode(GenericAPIView):
                     'email': requesting_user.email,
                     'code': recovery_token.token,
                 }
-                html_content = render_to_string('password_recovery.html', context)
+                html_content = render_to_string(
+                    'password_recovery.html', context)
                 text_content = strip_tags(html_content)
                 message = EmailMultiAlternatives(
                     subject, text_content, EMAIL_HOST_USER, [requesting_user.email])
@@ -150,6 +153,57 @@ class CreatePasswordRecoveryCode(GenericAPIView):
                         'message': "user not found"
                     },
                     status=404)
+
+
+class VerifyPasswordRecoveryCode(GenericAPIView):
+    permission_classes = [AllowAny, ]
+
+    def get(self, request, **kwargs):
+        # check if token exists
+        #TODO extract to pure function
+        if kwargs['token']:
+            found_token = PasswordRecoveryToken.objects.get(
+                token=kwargs['token'])
+
+            if found_token:
+                # check if token has expired
+                if found_token.is_expired:
+                    #return error message
+                    return JsonResponse(
+                        {
+                            'status': 'expired token',
+                            'message': "token provided has expired and cannot be used"
+                        },
+                        status=400)
+                else:
+                    #recalculate if token is expired
+                    token_duration = timezone.localtime() - found_token.time_generated
+
+                    if token_duration.seconds /3600 < 1:
+                        #token valid and can be used
+                        return JsonResponse(
+                            {
+                                'status': 'valid token',
+                                'message': "token is valid"
+                            },
+                            status=200)
+                    else:
+                        found_token.is_expired = True
+                        found_token.save()
+                        return JsonResponse(
+                            {
+                                'status': 'expired token',
+                                'message': "token provided has expired and cannot be used"
+                            },
+                            status=404)
+                        #update token to expired                    
+        else:
+            return JsonResponse(
+                {
+                    'status': 'missing token',
+                    'message': "no token was provided"
+                },
+                status=404)
 
 
 class ResendActivationEmail(GenericAPIView):
